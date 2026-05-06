@@ -1,0 +1,13 @@
+/target
+*.jks
+keystore.properties
+*.env
+.env.local
+.env.*.local
+.DS_Store
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
+node_modules/
