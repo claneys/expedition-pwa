@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Préparation Expédition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #242424;
+            --bg-card-hover: #2a2a2a;
+            --text-primary: #f5f5f0;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666;
+            --accent: #e07850;
+            --accent-hover: #e89070;
+            --accent-glow: rgba(224, 120, 80, 0.3);
+            --border: #333;
+            --success: #4ade80;
+            --danger: #ef4444;
+            --vêtements: #e07050;
+            --sécurité: #50a0e0;
+            --confort: #70c070;
+            --technique: #c090e0;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Instrument Sans', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 20px 100px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        header p { color: var(--text-secondary); font-size: 0.9rem; }
+        header p.status { font-size: 0.75rem; margin-top: 4px; }
+        header p.status.saved { color: var(--success); }
+        header p.status.saving { color: var(--accent); }
+        header p.status.error { color: var(--danger); }
+
+        .section { margin-bottom: 32px; }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .activities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .activity-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .activity-btn:hover { background: var(--bg-card-hover); border-color: var(--text-muted); }
+        .activity-btn.selected { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 2px 12px var(--accent-glow); }
+        .activity-btn .icon { font-size: 1rem; }
+        .activity-btn .check { display: none; width: 14px; height: 14px; }
+        .activity-btn.selected .check { display: block; }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .action-btn:hover { background: var(--bg-card); color: var(--text-primary); }
+        .action-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+        .action-btn.primary:hover { background: var(--accent-hover); }
+        .action-btn.danger { border-color: var(--danger); color: var(--danger); }
+        .action-btn.danger:hover { background: var(--danger); color: white; }
+        .action-btn svg { width: 14px; height: 14px; }
+
+        .gear-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .gear-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; }
+        .gear-count { font-size: 0.8rem; color: var(--text-muted); background: var(--bg-secondary); padding: 4px 10px; border-radius: 100px; }
+
+        .gear-empty { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        .gear-empty .icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; }
+
+        .gear-category { margin-bottom: 28px; animation: fadeInUp 0.3s ease forwards; opacity: 0; }
+        .category-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+        .category-header.community { border-bottom-color: var(--accent); }
+        .category-icon { width: 32px; height: 32px; background: var(--bg-card); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .category-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1rem; }
+        .category-badge { font-size: 0.7rem; color: var(--text-muted); background: var(--bg-secondary); padding: 3px 8px; border-radius: 100px; margin-left: auto; }
+
+        .subcategory { margin-bottom: 16px; }
+        .subcategory:last-child { margin-bottom: 0; }
+        .subcategory-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; padding-left: 2px; }
+        .subcategory-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .subcategory-dot.vêtements { background: var(--vêtements); }
+        .subcategory-dot.sécurité { background: var(--sécurité); }
+        .subcategory-dot.confot { background: var(--confort); }
+        .subcategory-dot.technique { background: var(--technique); }
+        .subcategory-name { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+
+        .gear-items { display: flex; flex-direction: column; gap: 4px; }
+
+        .gear-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+        }
+
+        .gear-item:hover { background: var(--bg-card-hover); border-color: var(--border); }
+        .gear-item:hover .item-edit { opacity: 1; }
+        .gear-item.packed { opacity: 0.4; }
+        .gear-item.packed .item-name { text-decoration: line-through; color: var(--text-muted); }
+
+        .gear-checkbox { position: relative; width: 18px; height: 18px; flex-shrink: 0; }
+        .gear-checkbox input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 1; }
+        .gear-checkbox .checkmark { position: absolute; inset: 0; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 4px; transition: all 0.15s ease; }
+        .gear-checkbox input:checked + .checkmark { background: var(--success); border-color: var(--success); }
+        .gear-checkbox .checkmark::after { content: ''; position: absolute; left: 5px; top: 2px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg) scale(0); transition: transform 0.15s ease; }
+        .gear-checkbox input:checked + .checkmark::after { transform: rotate(45deg) scale(1); }
+
+        .item-name { flex: 1; font-size: 0.9rem; }
+
+        .item-sub {
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 6px;
+            border-radius: 100px;
+        }
+
+        .item-sub.vêtements { background: rgba(224, 112, 80, 0.2); color: var(--vêtements); }
+        .item-sub.sécurité { background: rgba(80, 160, 224, 0.2); color: var(--sécurité); }
+        .item-sub.confot { background: rgba(112, 192, 112, 0.2); color: var(--confort); }
+        .item-sub.technique { background: rgba(192, 144, 224, 0.2); color: var(--technique); }
+
+        .item-qty { font-size: 0.8rem; color: var(--text-secondary); background: var(--bg-secondary); padding: 3px 8px; border-radius: 100px; min-width: 40px; text-align: center; }
+
+        .item-edit {
+            opacity: 0;
+            width: 26px;
+            height: 26px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.15s ease;
+        }
+
+        .item-edit:hover { background: var(--accent); color: white; }
+        .item-edit svg { width: 14px; height: 14px; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            animation: fadeInUp 0.2s ease;
+        }
+
+        .modal h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label { display: block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); font-family: inherit; font-size: 0.9rem; transition: border-color 0.15s ease; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        .form-row .form-group:first-child { flex: 2; }
+
+        .form-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .form-actions button { flex: 1; padding: 10px; border-radius: var(--radius-md); font-family: inherit; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.15s ease; }
+        .form-actions .cancel-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+        .form-actions .cancel-btn:hover { background: var(--bg-secondary); }
+        .form-actions .submit-btn { background: var(--accent); border: 1px solid var(--accent); color: white; }
+        .form-actions .submit-btn:hover { background: var(--accent-hover); }
+        .form-actions .delete-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+        .form-actions .delete-btn:hover { background: var(--danger); color: white; }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: var(--radius-lg);
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: all 0.25s ease;
+            z-index: 100;
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .gear-category { animation-fill-mode: forwards; }
+        .gear-category:nth-child(1) { animation-delay: 0ms; }
+        .gear-category:nth-child(2) { animation-delay: 50ms; }
+        .gear-category:nth-child(3) { animation-delay: 100ms; }
+        .gear-category:nth-child(4) { animation-delay: 150ms; }
+        .gear-category:nth-child(5) { animation-delay: 200ms; }
+        .gear-category:nth-child(6) { animation-delay: 250ms; }
+
+        @media (max-width: 480px) {
+            .container { padding: 20px 14px 80px; }
+            .activities { gap: 6px; }
+            .activity-btn { padding: 8px 12px; font-size: 0.8rem; }
+            .actions { flex-direction: column; }
+            .action-btn { min-width: 100%; }
+            .form-row { flex-direction: column; }
+            .form-row .form-group { flex: 1; }
+            .item-sub { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Préparation Expédition</h1>
+            <p>Sélectionnez vos activités et gérez votre matériel</p>
+            <p class="status" id="status"></p>
+        </header>
+
+        <section class="section">
+            <div class="section-label">Activités</div>
+            <div class="activities" id="activities"></div>
+        </section>
+
+        <div class="actions">
+            <button class="action-btn" onclick="selectAll()">Tout sel.</button>
+            <button class="action-btn" onclick="deselectAll()">Tout désel.</button>
+            <button class="action-btn primary" onclick="copyList()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="10" height="10" rx="2"/><path d="M2 12V2h10"/></svg>
+                Copier
+            </button>
+            <button class="action-btn" onclick="openAddModal()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg>
+                Ajouter
+            </button>
+        </div>
+
+        <section class="gear-section">
+            <div class="gear-header">
+                <h2 class="gear-title">Matériel</h2>
+                <span class="gear-count" id="gearCount">0 articles</span>
+            </div>
+            <div id="gearList"></div>
+        </section>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <h3 id="modalTitle">Modifier l'article</h3>
+            <div class="form-group">
+                <label>Nom de l'article</label>
+                <input type="text" id="itemName" placeholder="ex: Baudrier">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Quantité</label>
+                    <input type="number" id="itemQty" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Sous-catégorie</label>
+                    <select id="itemSub">
+                        <option value="vêtements">Vêtements</option>
+                        <option value="sécurité">Sécurité</option>
+                        <option value="confot">Confort</option>
+                        <option value="technique">Technique</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Catégorie</label>
+                <select id="itemCategory"></select>
+            </div>
+            <div class="form-actions">
+                <button class="cancel-btn" onclick="closeModal()">Annuler</button>
+                <button class="delete-btn" id="deleteBtn" onclick="deleteItem()" style="display:none;">Supprimer</button>
+                <button class="submit-btn" onclick="saveItem()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Message</div>
+
+    <script>
+        const subCategories = { vêtements: 'Vêtements', sécurité: 'Sécurité', confot: 'Confort', technique: 'Technique' };
+
+        let data = null;
+        let selectedActivities = new Set();
+        let packedItems = new Set();
+        let editingItem = null;
+        let isAddingNew = false;
+        let saveTimeout = null;
+
+        // Tauri integration
+        async function loadAppData() {
+            try {
+                setStatus('Chargement...', 'saving');
+                console.log('DEBUG: window.__TAURI__ =', window.__TAURI__);
+                if (!window.__TAURI__) {
+                    throw new Error('Tauri API not available - window.__TAURI__ is undefined');
+                }
+                console.log('DEBUG: Invoking load_data...');
+                const result = await window.__TAURI__.core.invoke('load_data');
+                console.log('DEBUG: load_data result:', result);
+                if (!result || !result.activities) {
+                    throw new Error('Invalid data format from backend');
+                }
+                console.log('DEBUG: activities count:', result.activities.length);
+                console.log('DEBUG: commun_gear count:', result.commun_gear.length);
+                data = result;
+                setStatus('Sauvegardé', 'saved');
+                return true;
+            } catch (e) {
+                console.error('Load error:', e);
+                setStatus('Erreur: ' + e.message || e, 'error');
+                return false;
+            }
+        }
+
+        async function saveAppData() {
+            if (!data) return;
+            try {
+                setStatus('Sauvegarde...', 'saving');
+                await window.__TAURI__.core.invoke('save_data', { data });
+                setStatus('Sauvegardé', 'saved');
+            } catch (e) {
+                console.error('Save error:', e);
+                setStatus('Erreur', 'error');
+            }
+        }
+
+        function scheduleSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(saveAppData, 500);
+        }
+
+        function setStatus(text, type) {
+            const el = document.getElementById('status');
+            el.textContent = text;
+            el.className = 'status ' + type;
+        }
+
+        function renderActivities() {
+            console.log('DEBUG: renderActivities called, data:', data);
+            if (!data) return;
+            const container = document.getElementById('activities');
+            container.innerHTML = data.activities.map(act => `
+                <button class="activity-btn ${selectedActivities.has(act.id) ? 'selected' : ''}" onclick="toggleActivity('${act.id}')">
+                    <span class="icon">${act.icon}</span>
+                    <span class="check"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg></span>
+                    <span class="label">${act.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderGear() {
+            console.log('DEBUG: renderGear called, data:', data);
+            if (!data) return;
+            const container = document.getElementById('gearList');
+            const countEl = document.getElementById('gearCount');
+
+            if (selectedActivities.size === 0) {
+                container.innerHTML = `<div class="gear-empty"><div class="icon">🎒</div><p>Sélectionnez une ou plusieurs activités<br>pour voir le matériel</p></div>`;
+                countEl.textContent = '0';
+                return;
+            }
+
+            let html = '';
+            let totalItems = 0;
+
+            selectedActivities.forEach(actId => {
+                const act = data.activities.find(a => a.id === actId);
+                const items = data.specific_gear[actId] || [];
+                if (items.length > 0) {
+                    totalItems += items.length;
+                    html += renderCategory(act.icon, act.name, items, actId, false);
+                }
+            });
+
+            totalItems += data.commun_gear.length;
+            html += renderCategory('🎒', 'Commun', data.commun_gear, 'commun', true);
+
+            const packedCount = packedItems.size;
+            countEl.textContent = packedCount > 0 ? `${totalItems - packedCount}/${totalItems}` : `${totalItems}`;
+
+            container.innerHTML = html;
+        }
+
+        function renderCategory(icon, name, items, prefix, isCommunity) {
+            const grouped = { vêtements: [], sécurité: [], confot: [], technique: [] };
+            items.forEach((item, idx) => {
+                const sub = item.sub || 'technique';
+                grouped[sub].push({ ...item, idx, id: `${prefix}-${idx}` });
+            });
+
+            const headerClass = isCommunity ? 'community' : '';
+            let subHtml = '';
+
+            Object.keys(subCategories).forEach(sub => {
+                const subItems = grouped[sub];
+                if (subItems.length > 0) {
+                    subHtml += `<div class="subcategory">
+                        <div class="subcategory-header"><span class="subcategory-dot ${sub}"></span><span class="subcategory-name">${subCategories[sub]}</span></div>
+                        <div class="gear-items">${subItems.map(item => renderGearItem(item, prefix)).join('')}</div>
+                    </div>`;
+                }
+            });
+
+            return `<div class="gear-category"><div class="category-header ${headerClass}"><div class="category-icon">${icon}</div><span class="category-name">${name}</span><span class="category-badge">${items.length}</span></div>${subHtml}</div>`;
+        }
+
+        function renderGearItem(item, prefix) {
+            const isPacked = packedItems.has(item.id);
+            return `<div class="gear-item ${isPacked ? 'packed' : ''}" onclick="togglePacked('${item.id}')">
+                <label class="gear-checkbox" onclick="event.stopPropagation()">
+                    <input type="checkbox" ${isPacked ? 'checked' : ''} onchange="togglePacked('${item.id}')">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="item-name">${item.name}</span>
+                <span class="item-sub ${item.sub}">${subCategories[item.sub] || ''}</span>
+                <span class="item-qty">${item.qty > 1 ? '×' + item.qty : ''}</span>
+                <button class="item-edit" onclick="event.stopPropagation(); openEditModal('${prefix}', ${item.idx})">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/><path d="M10 4l2 2"/></svg>
+                </button>
+            </div>`;
+        }
+
+        function toggleActivity(id) {
+            if (selectedActivities.has(id)) selectedActivities.delete(id);
+            else selectedActivities.add(id);
+            renderActivities();
+            renderGear();
+        }
+
+        function togglePacked(id) {
+            if (packedItems.has(id)) packedItems.delete(id);
+            else packedItems.add(id);
+            renderGear();
+        }
+
+        function selectAll() {
+            data.activities.forEach(act => selectedActivities.add(act.id));
+            renderActivities();
+            renderGear();
+        }
+
+        function deselectAll() {
+            selectedActivities.clear();
+            packedItems.clear();
+            renderActivities();
+            renderGear();
+        }
+
+        async function copyList() {
+            if (selectedActivities.size === 0) { showToast('Sélectionnez d\'abord des activités'); return; }
+            let text = '📋 LISTE DE MATÉRIEL\n' + '═'.repeat(28) + '\n\n';
+            const actNames = Array.from(selectedActivities).map(id => data.activities.find(a => a.id === id)?.name).join(' + ');
+            text += `🎯 ${actNames}\n\n`;
+
+            selectedActivities.forEach(actId => {
+                const act = data.activities.find(a => a.id === actId);
+                const items = data.specific_gear[actId] || [];
+                if (items.length > 0) {
+                    text += `${act.icon} ${act.name}\n` + '─'.repeat(18) + '\n';
+                    items.forEach((item, idx) => { text += `${packedItems.has(actId + '-' + idx) ? '✓' : '☐'} ${item.name}${item.qty > 1 ? ' (×' + item.qty + ')' : ''}\n`; });
+                    text += '\n';
+                }
+            });
+
+            text += '🎒 COMMUN\n' + '─'.repeat(18) + '\n';
+            data.commun_gear.forEach((item, idx) => { text += `${packedItems.has('commun-' + idx) ? '✓' : '☐'} ${item.name}${item.qty > 1 ? ' (×' + item.qty + ')' : ''}\n`; });
+            text += '\n' + '═'.repeat(28) + '\n';
+
+            try {
+                if (window.__TAURI__) {
+                    await window.__TAURI__.core.invoke('copy_to_clipboard', { text });
+                } else {
+                    await navigator.clipboard.writeText(text);
+                }
+                showToast('Liste copiée !');
+            } catch (e) { showToast('Erreur lors de la copie'); }
+        }
+
+        function openAddModal() {
+            isAddingNew = true;
+            editingItem = null;
+            document.getElementById('modalTitle').textContent = 'Ajouter un article';
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemQty').value = '1';
+            document.getElementById('itemSub').value = 'technique';
+            document.getElementById('deleteBtn').style.display = 'none';
+            const select = document.getElementById('itemCategory');
+            select.innerHTML = '<option value="commun">Commun</option>' + data.activities.map(act => `<option value="${act.id}">${act.icon} ${act.name}</option>`).join('');
+            document.getElementById('editModal').classList.add('show');
+            document.getElementById('itemName').focus();
+        }
+
+        function openEditModal(category, index) {
+            isAddingNew = false;
+            editingItem = { category, index };
+            let item = category === 'commun' ? data.commun_gear[index] : data.specific_gear[category][index];
+            document.getElementById('modalTitle').textContent = 'Modifier l\'article';
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemQty').value = item.qty;
+            document.getElementById('itemSub').value = item.sub;
+            document.getElementById('deleteBtn').style.display = 'block';
+            const select = document.getElementById('itemCategory');
+            select.innerHTML = '<option value="commun">Commun</option>' + data.activities.map(act => `<option value="${act.id}" ${act.id === category ? 'selected' : ''}>${act.icon} ${act.name}</option>`).join('');
+            document.getElementById('editModal').classList.add('show');
+            document.getElementById('itemName').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('show');
+            editingItem = null;
+        }
+
+        async function saveItem() {
+            const name = document.getElementById('itemName').value.trim();
+            const qty = parseInt(document.getElementById('itemQty').value) || 1;
+            const sub = document.getElementById('itemSub').value;
+            const category = document.getElementById('itemCategory').value;
+
+            if (!name) { showToast('Entrez un nom'); return; }
+
+            const itemData = { name, qty, sub };
+
+            if (isAddingNew) {
+                if (category === 'commun') data.commun_gear.push(itemData);
+                else { if (!data.specific_gear[category]) data.specific_gear[category] = []; data.specific_gear[category].push(itemData); }
+                showToast('Article ajouté');
+            } else if (editingItem) {
+                const { category: oldCat, index } = editingItem;
+                if (oldCat === 'commun') data.commun_gear.splice(index, 1);
+                else data.specific_gear[oldCat].splice(index, 1);
+                if (category === 'commun') data.commun_gear.push(itemData);
+                else { if (!data.specific_gear[category]) data.specific_gear[category] = []; data.specific_gear[category].push(itemData); }
+                showToast('Article modifié');
+            }
+
+            closeModal();
+            renderGear();
+            scheduleSave();
+        }
+
+        async function deleteItem() {
+            if (!editingItem) return;
+            if (!confirm('Supprimer cet article ?')) return;
+            const { category, index } = editingItem;
+            if (category === 'commun') data.commun_gear.splice(index, 1);
+            else data.specific_gear[category].splice(index, 1);
+            closeModal();
+            renderGear();
+            scheduleSave();
+            showToast('Article supprimé');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        async function init() {
+            console.log('DEBUG: init called');
+            // Wait for Tauri API to be ready
+            if (!window.__TAURI__) {
+                console.log('DEBUG: Waiting for Tauri API...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            console.log('DEBUG: window.__TAURI__ =', window.__TAURI__);
+            const loaded = await loadAppData();
+            console.log('DEBUG: loaded =', loaded);
+            if (loaded) {
+                console.log('DEBUG: data =', data);
+                renderActivities();
+                renderGear();
+                const select = document.getElementById('itemCategory');
+                select.innerHTML = '<option value="commun">Commun</option>' + data.activities.map(act => `<option value="${act.id}">${act.icon} ${act.name}</option>`).join('');
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

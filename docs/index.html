@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f0f0f">
+    <meta name="description" content="Application de checklist pour expéditions outdoor">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Préparation Expédition</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #242424;
+            --bg-card-hover: #2a2a2a;
+            --text-primary: #f5f5f0;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666;
+            --accent: #e07850;
+            --accent-hover: #e89070;
+            --accent-glow: rgba(224, 120, 80, 0.3);
+            --border: #333;
+            --success: #4ade80;
+            --danger: #ef4444;
+            --vêtements: #e07050;
+            --sécurité: #50a0e0;
+            --confort: #70c070;
+            --technique: #c090e0;
+            --bivouac: #d4a853;
+            --nourriture: #e8a0c8;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Instrument Sans', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px 20px 100px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .activity-section {
+            margin-bottom: 40px;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .activities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .activity-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .activity-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+        }
+
+        .activity-btn.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .activity-btn .icon {
+            font-size: 1.1rem;
+        }
+
+        .activity-btn .check {
+            display: none;
+            width: 16px;
+            height: 16px;
+        }
+
+        .activity-btn.selected .check {
+            display: block;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .action-btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .gear-section {
+            margin-bottom: 40px;
+        }
+
+        .gear-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .gear-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .gear-count {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            padding: 6px 12px;
+            border-radius: 100px;
+        }
+
+        .gear-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .gear-empty .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .gear-category {
+            margin-bottom: 32px;
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .category-header.community {
+            border-bottom-color: var(--accent);
+        }
+
+        .category-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .category-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .category-badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            padding: 4px 10px;
+            border-radius: 100px;
+            margin-left: auto;
+        }
+
+        .subcategory {
+            margin-bottom: 20px;
+        }
+
+        .subcategory:last-child {
+            margin-bottom: 0;
+        }
+
+        .subcategory-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-left: 4px;
+        }
+
+        .subcategory-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .subcategory-dot.vêtements { background: var(--vêtements); }
+        .subcategory-dot.sécurité { background: var(--sécurité); }
+        .subcategory-dot.confort { background: var(--confort); }
+        .subcategory-dot.technique { background: var(--technique); }
+        .subcategory-dot.bivouac { background: var(--bivouac); }
+        .subcategory-dot.nourriture { background: var(--nourriture); }
+
+        .subcategory-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        .gear-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .gear-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .gear-item:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border);
+        }
+
+        .gear-item.packed {
+            opacity: 0.4;
+        }
+
+        .gear-item.packed .item-name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .gear-checkbox {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .gear-checkbox input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .gear-checkbox .checkmark {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .gear-checkbox input:checked + .checkmark {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .gear-checkbox .checkmark::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) scale(0);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gear-checkbox input:checked + .checkmark::after {
+            transform: rotate(45deg) scale(1);
+        }
+
+        .item-name {
+            flex: 1;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .item-qty {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 4px 10px;
+            border-radius: 100px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .item-qty:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .item-qty input {
+            width: 28px;
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+        }
+
+        .item-qty input::-webkit-inner-spin-button,
+        .item-qty input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+
+        .item-subcategory {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 3px 8px;
+            border-radius: 100px;
+            opacity: 0.7;
+        }
+
+        .item-subcategory.vêtements { background: rgba(224, 112, 80, 0.2); color: var(--vêtements); }
+        .item-subcategory.sécurité { background: rgba(80, 160, 224, 0.2); color: var(--sécurité); }
+        .item-subcategory.confort { background: rgba(112, 192, 112, 0.2); color: var(--confort); }
+        .item-subcategory.technique { background: rgba(192, 144, 224, 0.2); color: var(--technique); }
+        .item-subcategory.bivouac { background: rgba(212, 168, 83, 0.2); color: var(--bivouac); }
+        .item-subcategory.nourriture { background: rgba(232, 160, 200, 0.2); color: var(--nourriture); }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 14px 24px;
+            border-radius: var(--radius-lg);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        .modal-input:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-actions button:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .modal-actions button.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .modal-actions button.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Custom gear section */
+        .custom-gear-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 2px solid var(--border);
+        }
+
+        .gear-source-badge {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 100px;
+            background: var(--bg-secondary);
+            color: var(--text-muted);
+            margin-left: 8px;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gear-category { animation-fill-mode: forwards; }
+        .gear-category:nth-child(1) { animation-delay: 0ms; }
+        .gear-category:nth-child(2) { animation-delay: 60ms; }
+        .gear-category:nth-child(3) { animation-delay: 120ms; }
+        .gear-category:nth-child(4) { animation-delay: 180ms; }
+        .gear-category:nth-child(5) { animation-delay: 240ms; }
+        .gear-category:nth-child(6) { animation-delay: 300ms; }
+
+        @media (max-width: 480px) {
+            .container { padding: 24px 16px 80px; }
+            .activities { gap: 8px; }
+            .activity-btn { padding: 10px 14px; font-size: 0.85rem; }
+            .actions { flex-direction: column; }
+            .action-btn { min-width: 100%; }
+            .gear-item { padding: 10px 12px; }
+            .item-subcategory { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Préparation Expédition</h1>
+            <p>Sélectionnez vos activités pour générer la liste de matériel</p>
+        </header>
+
+        <section class="activity-section">
+            <div class="section-label">Activités</div>
+            <div class="activities" id="activities"></div>
+        </section>
+
+        <div class="actions">
+            <button class="action-btn" onclick="selectAll()">Tout sélectionner</button>
+            <button class="action-btn" onclick="deselectAll()">Tout désélectionner</button>
+            <button class="action-btn primary" onclick="copyList()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="4" y="4" width="10" height="10" rx="2"/>
+                    <path d="M2 12V2h10"/>
+                </svg>
+                Copier
+            </button>
+        </div>
+
+        <div class="actions">
+            <button class="action-btn" onclick="showAddModal()">+ Ajouter item</button>
+            <button class="action-btn" onclick="showGearShareModal()">🔗 Gear-share</button>
+        </div>
+
+        <section class="gear-section">
+            <div class="gear-header">
+                <h2 class="gear-title">Matériel</h2>
+                <span class="gear-count" id="gearCount">0 articles</span>
+            </div>
+            <div id="gearList"></div>
+        </section>
+    </div>
+
+    <div class="toast" id="toast">Message</div>
+
+    <!-- Add Item Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal">
+            <h3>Ajouter un item</h3>
+            <input type="text" class="modal-input" id="newItemName" placeholder="Nom de l'item">
+            <input type="number" class="modal-input" id="newItemQty" placeholder="Quantité" value="1" min="1">
+            <select class="modal-select" id="newItemSub">
+                <option value="vêtements">Vêtements</option>
+                <option value="sécurité">Sécurité</option>
+                <option value="confort">Confort</option>
+                <option value="technique">Technique</option>
+                <option value="bivouac">Bivouac</option>
+                <option value="nourriture">Nourriture</option>
+            </select>
+            <div class="modal-actions">
+                <button onclick="hideAddModal()">Annuler</button>
+                <button class="primary" onclick="addCustomItem()">Ajouter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gear-share Modal -->
+    <div class="modal-overlay" id="gearShareModal">
+        <div class="modal">
+            <h3>Importer depuis Gear-share</h3>
+            <input type="text" class="modal-input" id="gsUrl" placeholder="URL API (ex: http://localhost:8000)">
+            <input type="text" class="modal-input" id="gsUsername" placeholder="Nom d'utilisateur">
+            <input type="password" class="modal-input" id="gsPassword" placeholder="Mot de passe">
+            <div class="modal-actions">
+                <button onclick="hideGearShareModal()">Annuler</button>
+                <button class="primary" onclick="importGearShare()">Importer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // TAURI API
+        // ═══════════════════════════════════════════════════════════════
+        const hasTauri = typeof window.__TAURI__ !== 'undefined';
+        const invoke = hasTauri && window.__TAURI__.core ? window.__TAURI__.core.invoke.bind(window.__TAURI__.core) : null;
+
+        async function tauriLoad() {
+            if (!invoke) return null;
+            try {
+                return await invoke('load_data');
+            } catch (e) {
+                console.error('load_data error:', e);
+                return null;
+            }
+        }
+
+        async function tauriSave() {
+            if (!invoke) return;
+            try {
+                await invoke('save_data', {
+                    data: {
+                        activities: activities,
+                        specific_gear: specificGear,
+                        commun_gear: communGear,
+                        custom_gear: customGear,
+                        gear_share_config: gearShareConfig
+                    }
+                });
+            } catch (e) {
+                console.error('save_data error:', e);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // DATA
+        // ═══════════════════════════════════════════════════════════════
+        let activities = [
+            { id: 'ski-rando', name: 'Ski de rando', icon: '⛷️' },
+            { id: 'alpinisme', name: 'Alpinisme', icon: '🧗' },
+            { id: 'escalade', name: 'Escalade', icon: '🧗' },
+            { id: 'randonnee', name: 'Randonnée', icon: '🥾' },
+            { id: 'trek', name: 'Trek', icon: '🏕️' }
+        ];
+
+        const subCategories = {
+            vêtements: 'Vêtements',
+            sécurité: 'Sécurité',
+            confort: 'Confort',
+            technique: 'Technique',
+            bivouac: 'Bivouac',
+            nourriture: 'Nourriture'
+        };
+
+        let specificGear = {
+            'ski-rando': [
+                { name: 'Skis', qty: 1, sub: 'technique' },
+                { name: 'Peaux', qty: 1, sub: 'technique' },
+                { name: 'Chaussures de skis', qty: 1, sub: 'technique' },
+                { name: 'Bâtons', qty: 1, sub: 'technique' },
+                { name: 'Couteaux', qty: 1, sub: 'technique' }
+            ],
+            'alpinisme': [
+                { name: 'Crampons', qty: 1, sub: 'technique' },
+                { name: 'Piolet', qty: 1, sub: 'technique' },
+                { name: 'Casque', qty: 1, sub: 'sécurité' },
+                { name: 'Baudrier', qty: 1, sub: 'technique' }
+            ],
+            'escalade': [
+                { name: 'Corde simple', qty: 1, sub: 'technique' },
+                { name: 'Corde double', qty: 1, sub: 'technique' }
+            ],
+            'randonnee': [
+                { name: 'Bâtons randonné', qty: 1, sub: 'technique' }
+            ],
+            'trek': [
+                { name: 'Tente / Tarp', qty: 1, sub: 'bivouac' },
+                { name: 'Sac de couchage', qty: 1, sub: 'bivouac' },
+                { name: 'Matelas', qty: 1, sub: 'bivouac' },
+                { name: 'Réchaud + cartouche', qty: 1, sub: 'bivouac' },
+                { name: 'Popote + couverts', qty: 1, sub: 'bivouac' },
+                { name: 'Nourriture 3j', qty: 1, sub: 'nourriture' },
+                { name: 'Corde', qty: 1, sub: 'technique' }
+            ]
+        };
+
+        let communGear = [
+            { name: 'Collant Mérinos', qty: 1, sub: 'vêtements' },
+            { name: 'Pantalon ski', qty: 1, sub: 'vêtements' },
+            { name: 'Chaussettes ski', qty: 1, sub: 'vêtements' },
+            { name: 'Polaire', qty: 1, sub: 'vêtements' },
+            { name: 'Goretex', qty: 1, sub: 'vêtements' },
+            { name: 'Doudoune', qty: 1, sub: 'vêtements' },
+            { name: 'Bonnet-buff', qty: 1, sub: 'vêtements' },
+            { name: 'Gants', qty: 2, sub: 'vêtements' },
+            { name: 'Lunettes soleil', qty: 1, sub: 'vêtements' },
+            { name: 'Masque', qty: 1, sub: 'vêtements' },
+            { name: 'Crème solaire', qty: 1, sub: 'vêtements' },
+            { name: 'Frontale', qty: 1, sub: 'sécurité' },
+            { name: 'Sac à viande', qty: 1, sub: 'sécurité' },
+            { name: 'Médicaments + boules quies', qty: 1, sub: 'sécurité' },
+            { name: 'Gourde', qty: 1, sub: 'confort' },
+            { name: 'Thermos', qty: 1, sub: 'confort' },
+            { name: 'Barres énergétiques', qty: 1, sub: 'confort' },
+            { name: 'Chargeur téléphone', qty: 1, sub: 'confort' },
+            { name: 'Batterie externe', qty: 1, sub: 'confort' },
+            { name: 'Musique / Écouteurs', qty: 1, sub: 'confort' },
+            { name: 'Microserviette + nécessaire toilette', qty: 1, sub: 'confort' },
+            { name: 'Sac à dos 35L mini', qty: 1, sub: 'technique' },
+            { name: 'Cash (ouèche pour refuge)', qty: 1, sub: 'technique' },
+            { name: 'Collant + sous-pull rechange refuge', qty: 1, sub: 'technique' }
+        ];
+
+        let customGear = [];
+        let gearShareConfig = null;
+
+        // ═══════════════════════════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════════════════════════
+        let selectedActivities = new Set();
+        let packedItems = new Set();
+
+        // ═══════════════════════════════════════════════════════════════
+        // RENDER
+        // ═══════════════════════════════════════════════════════════════
+        function renderActivities() {
+            const container = document.getElementById('activities');
+            container.innerHTML = activities.map(act => `
+                <button class="activity-btn ${selectedActivities.has(act.id) ? 'selected' : ''}"
+                        onclick="toggleActivity('${act.id}')">
+                    <span class="icon">${act.icon}</span>
+                    <span class="check">
+                        <svg viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+                        </svg>
+                    </span>
+                    <span class="label">${act.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderGear() {
+            const container = document.getElementById('gearList');
+            const countEl = document.getElementById('gearCount');
+
+            if (selectedActivities.size === 0) {
+                container.innerHTML = `
+                    <div class="gear-empty">
+                        <div class="icon">🎒</div>
+                        <p>Sélectionnez une ou plusieurs activités<br>pour voir le matériel nécessaire</p>
+                    </div>
+                `;
+                countEl.textContent = '0 articles';
+                return;
+            }
+
+            let html = '';
+            let totalItems = 0;
+
+            selectedActivities.forEach(actId => {
+                const act = activities.find(a => a.id === actId);
+                const items = specificGear[actId] || [];
+                if (items.length > 0) {
+                    totalItems += items.length;
+                    html += renderCategory(act.icon, act.name, items, act.id, false);
+                }
+            });
+
+            totalItems += communGear.length;
+            html += renderCategory('🎒', 'Commun', communGear, 'commun', true);
+
+            // Render custom gear if any
+            if (customGear.length > 0) {
+                totalItems += customGear.length;
+                html += renderCategory('✨', 'Personnalisé', customGear, 'custom', false);
+            }
+
+            const packedCount = packedItems.size;
+            countEl.textContent = packedCount > 0
+                ? `${totalItems - packedCount}/${totalItems} articles`
+                : `${totalItems} articles`;
+
+            container.innerHTML = html;
+        }
+
+        function renderCategory(icon, name, items, prefix, isCommunity) {
+            const grouped = {};
+            Object.keys(subCategories).forEach(sub => grouped[sub] = []);
+
+            items.forEach((item, idx) => {
+                const sub = item.sub || 'technique';
+                const key = grouped[sub] !== undefined ? sub : 'technique';
+                grouped[key].push({ ...item, idx, id: `${prefix}-${idx}` });
+            });
+
+            const headerClass = isCommunity ? 'community' : '';
+            let subHtml = '';
+
+            Object.keys(subCategories).forEach(sub => {
+                const subItems = grouped[sub];
+                if (subItems.length > 0) {
+                    subHtml += `
+                        <div class="subcategory">
+                            <div class="subcategory-header">
+                                <span class="subcategory-dot ${sub}"></span>
+                                <span class="subcategory-name">${subCategories[sub]}</span>
+                            </div>
+                            <div class="gear-items">
+                                ${subItems.map(item => renderGearItem(item)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            return `
+                <div class="gear-category">
+                    <div class="category-header ${headerClass}">
+                        <div class="category-icon">${icon}</div>
+                        <span class="category-name">${name}</span>
+                        <span class="category-badge">${items.length} articles</span>
+                    </div>
+                    ${subHtml}
+                </div>
+            `;
+        }
+
+        function renderGearItem(item) {
+            const isPacked = packedItems.has(item.id);
+            const sourceBadge = item.source ? `<span class="gear-source-badge">${item.source}</span>` : '';
+            return `
+                <div class="gear-item ${isPacked ? 'packed' : ''}" onclick="togglePacked('${item.id}')">
+                    <label class="gear-checkbox" onclick="event.stopPropagation()">
+                        <input type="checkbox" ${isPacked ? 'checked' : ''} onchange="togglePacked('${item.id}')">
+                        <span class="checkmark"></span>
+                    </label>
+                    <span class="item-name">${item.name}${sourceBadge}</span>
+                    <span class="item-subcategory ${item.sub}">${subCategories[item.sub] || item.sub}</span>
+                    <div class="item-qty" onclick="event.stopPropagation()">
+                        <input type="number" value="${item.qty}" min="1"
+                               onchange="updateQty('${item.id}', this.value)"
+                               onclick="event.stopPropagation()">
+                    </div>
+                </div>
+            `;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // ACTIONS
+        // ═══════════════════════════════════════════════════════════════
+        function toggleActivity(id) {
+            if (selectedActivities.has(id)) {
+                selectedActivities.delete(id);
+            } else {
+                selectedActivities.add(id);
+            }
+            renderActivities();
+            renderGear();
+            tauriSave();
+        }
+
+        function togglePacked(id) {
+            if (packedItems.has(id)) {
+                packedItems.delete(id);
+            } else {
+                packedItems.add(id);
+            }
+            renderGear();
+        }
+
+        function updateQty(id, value) {
+            const newQty = parseInt(value) || 1;
+            const parts = id.split('-');
+            const idx = parseInt(parts[parts.length - 1]);
+            const prefix = parts.slice(0, -1).join('-');
+            if (prefix === 'commun') {
+                communGear[idx].qty = newQty;
+            } else if (prefix === 'custom') {
+                customGear[idx].qty = newQty;
+            } else {
+                specificGear[prefix][idx].qty = newQty;
+            }
+            tauriSave();
+            renderGear();
+        }
+
+        function selectAll() {
+            activities.forEach(act => selectedActivities.add(act.id));
+            renderActivities();
+            renderGear();
+            tauriSave();
+        }
+
+        function deselectAll() {
+            selectedActivities.clear();
+            packedItems.clear();
+            renderActivities();
+            renderGear();
+            tauriSave();
+        }
+
+        function copyList() {
+            if (selectedActivities.size === 0) {
+                showToast('Sélectionnez d\'abord des activités');
+                return;
+            }
+
+            let text = '📋 LISTE DE MATÉRIEL\n';
+            text += '═'.repeat(30) + '\n\n';
+
+            const actNames = Array.from(selectedActivities).map(id =>
+                activities.find(a => a.id === id)?.name
+            ).join(' + ');
+            text += `🎯 Activités: ${actNames}\n\n`;
+
+            selectedActivities.forEach(actId => {
+                const act = activities.find(a => a.id === actId);
+                const items = specificGear[actId] || [];
+                if (items.length > 0) {
+                    text += `${act.icon} ${act.name.toUpperCase()}\n`;
+                    text += '─'.repeat(20) + '\n';
+                    items.forEach((item, idx) => {
+                        const packed = packedItems.has(actId + '-' + idx) ? '✓' : '☐';
+                        text += `${packed} ${item.name}${item.qty > 1 ? ` (×${item.qty})` : ''}\n`;
+                    });
+                    text += '\n';
+                }
+            });
+
+            text += '🎒 COMMUN\n';
+            text += '─'.repeat(20) + '\n';
+            communGear.forEach((item, idx) => {
+                const packed = packedItems.has('commun-' + idx) ? '✓' : '☐';
+                text += `${packed} ${item.name}${item.qty > 1 ? ` (×${item.qty})` : ''}\n`;
+            });
+
+            if (customGear.length > 0) {
+                text += '\n✨ PERSONNALISÉ\n';
+                text += '─'.repeat(20) + '\n';
+                customGear.forEach((item, idx) => {
+                    const packed = packedItems.has('custom-' + idx) ? '✓' : '☐';
+                    text += `${packed} ${item.name}${item.qty > 1 ? ` (×${item.qty})` : ''}\n`;
+                });
+            }
+
+            text += '\n' + '═'.repeat(30) + '\n';
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Liste copiée !');
+            }).catch(() => {
+                showToast('Erreur lors de la copie');
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // MODALS
+        // ═══════════════════════════════════════════════════════════════
+        function showAddModal() {
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        function hideAddModal() {
+            document.getElementById('addModal').classList.remove('active');
+            document.getElementById('newItemName').value = '';
+            document.getElementById('newItemQty').value = '1';
+        }
+
+        function showGearShareModal() {
+            document.getElementById('gearShareModal').classList.add('active');
+        }
+
+        function hideGearShareModal() {
+            document.getElementById('gearShareModal').classList.remove('active');
+        }
+
+        async function addCustomItem() {
+            const name = document.getElementById('newItemName').value.trim();
+            const qty = parseInt(document.getElementById('newItemQty').value) || 1;
+            const sub = document.getElementById('newItemSub').value;
+
+            if (!name) {
+                showToast('Veuillez entrer un nom');
+                return;
+            }
+
+            if (invoke) {
+                try {
+                    const result = await invoke('add_custom_gear', { name, qty, sub });
+                    customGear = result.custom_gear;
+                    renderGear();
+                    showToast('Item ajouté !');
+                    hideAddModal();
+                } catch (e) {
+                    showToast('Erreur: ' + e);
+                }
+            } else {
+                // Fallback for web
+                customGear.push({ name, qty, sub, checked: false, source: 'custom' });
+                renderGear();
+                showToast('Item ajouté !');
+                hideAddModal();
+            }
+        }
+
+        async function importGearShare() {
+            const apiUrl = document.getElementById('gsUrl').value.trim();
+            const username = document.getElementById('gsUsername').value.trim();
+            const password = document.getElementById('gsPassword').value;
+
+            if (!apiUrl || !username || !password) {
+                showToast('Veuillez remplir tous les champs');
+                return;
+            }
+
+            if (invoke) {
+                try {
+                    showToast('Importation en cours...');
+                    const items = await invoke('fetch_gear_share', { apiUrl, username, password });
+                    items.forEach(item => customGear.push(item));
+                    renderGear();
+                    showToast(`${items.length} items importés !`);
+                    hideGearShareModal();
+                } catch (e) {
+                    showToast('Erreur: ' + e);
+                }
+            } else {
+                showToast('Fonctionnalité disponible uniquement dans l\'app');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════════════
+        async function init() {
+            const data = await tauriLoad();
+            if (data) {
+                activities = data.activities || activities;
+                specificGear = data.specific_gear || specificGear;
+                communGear = data.commun_gear || communGear;
+                customGear = data.custom_gear || [];
+                gearShareConfig = data.gear_share_config || null;
+            }
+            renderActivities();
+            renderGear();
+        }
+
+        init();
+
+        // Enregistrer le service worker pour PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker enregistré'))
+                .catch(err => console.log('Service Worker erreur:', err));
+        }
+    </script>
+</body>
+</html>
