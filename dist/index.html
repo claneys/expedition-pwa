@@ -649,6 +649,25 @@
             <button class="action-btn" onclick="showGearShareModal()">🔗 Gear-share</button>
         </div>
 
+        <div class="trek-config" id="trekConfig" style="display: none; margin-bottom: 20px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <span class="section-label" style="margin-bottom: 0;">Configuration Trek</span>
+                <span id="trekDaysDisplay" style="color: var(--accent); font-weight: 600;">3 jours</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 0.85rem; color: var(--text-secondary);">Jours:</span>
+                <input type="range" id="trekDaysSlider" min="1" max="14" value="3" 
+                       style="flex: 1; accent-color: var(--accent);"
+                       oninput="updateTrekDaysDisplay(this.value)" onchange="updateTrekDays(this.value)">
+                <input type="number" id="trekDaysInput" min="1" max="14" value="3"
+                       style="width: 60px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); padding: 6px; text-align: center;"
+                       onchange="updateTrekDays(this.value)">
+            </div>
+            <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">
+                La nourriture sera ajustée automatiquement
+            </div>
+        </div>
+
         <section class="gear-section">
             <div class="gear-header">
                 <h2 class="gear-title">Matériel</h2>
@@ -666,6 +685,7 @@
             <h3>Ajouter un item</h3>
             <input type="text" class="modal-input" id="newItemName" placeholder="Nom de l'item">
             <input type="number" class="modal-input" id="newItemQty" placeholder="Quantité" value="1" min="1">
+            <input type="number" class="modal-input" id="newItemWeight" placeholder="Poids (g) - optionnel" min="0">
             <select class="modal-select" id="newItemSub">
                 <option value="vêtements">Vêtements</option>
                 <option value="sécurité">Sécurité</option>
@@ -810,6 +830,7 @@
 
         let customGear = [];
         let gearShareConfig = null;
+        let trekDays = 3;
 
         // ═══════════════════════════════════════════════════════════════
         // STATE
@@ -925,6 +946,7 @@
         function renderGearItem(item) {
             const isPacked = packedItems.has(item.id);
             const sourceBadge = item.source ? `<span class="gear-source-badge">${item.source}</span>` : '';
+            const weightBadge = item.weight_g ? `<span class="item-weight">${item.weight_g}g</span>` : '';
             return `
                 <div class="gear-item ${isPacked ? 'packed' : ''}" onclick="togglePacked('${item.id}')">
                     <label class="gear-checkbox" onclick="event.stopPropagation()">
@@ -933,6 +955,7 @@
                     </label>
                     <span class="item-name">${item.name}${sourceBadge}</span>
                     <span class="item-subcategory ${item.sub}">${subCategories[item.sub] || item.sub}</span>
+                    ${weightBadge}
                     <div class="item-qty" onclick="event.stopPropagation()">
                         <input type="number" value="${item.qty}" min="1"
                                onchange="updateQty('${item.id}', this.value)"
@@ -951,6 +974,15 @@
             } else {
                 selectedActivities.add(id);
             }
+            
+            // Show/hide trek config
+            const trekConfig = document.getElementById('trekConfig');
+            if (selectedActivities.has('trek')) {
+                trekConfig.style.display = 'block';
+            } else {
+                trekConfig.style.display = 'none';
+            }
+            
             renderActivities();
             renderGear();
             tauriSave();
@@ -1060,6 +1092,7 @@
             document.getElementById('addModal').classList.remove('active');
             document.getElementById('newItemName').value = '';
             document.getElementById('newItemQty').value = '1';
+            document.getElementById('newItemWeight').value = '';
         }
 
         function showGearShareModal() {
@@ -1073,6 +1106,8 @@
         async function addCustomItem() {
             const name = document.getElementById('newItemName').value.trim();
             const qty = parseInt(document.getElementById('newItemQty').value) || 1;
+            const weightInput = document.getElementById('newItemWeight').value;
+            const weight_g = weightInput ? parseInt(weightInput) : null;
             const sub = document.getElementById('newItemSub').value;
 
             if (!name) {
@@ -1082,7 +1117,7 @@
 
             if (invoke) {
                 try {
-                    const result = await invoke('add_custom_gear', { name, qty, sub });
+                    const result = await invoke('add_custom_gear', { name, qty, sub, weight_g });
                     customGear = result.custom_gear;
                     renderGear();
                     showToast('Item ajouté !');
@@ -1092,7 +1127,7 @@
                 }
             } else {
                 // Fallback for web
-                customGear.push({ name, qty, sub, checked: false, source: 'custom' });
+                customGear.push({ name, qty, sub, checked: false, source: 'custom', weight_g });
                 renderGear();
                 showToast('Item ajouté !');
                 hideAddModal();
@@ -1143,9 +1178,46 @@
                 communGear = data.commun_gear || communGear;
                 customGear = data.custom_gear || [];
                 gearShareConfig = data.gear_share_config || null;
+                trekDays = data.trek_days || 3;
+                
+                // Update trek food quantity based on days
+                updateTrekFoodQuantity();
             }
             renderActivities();
             renderGear();
+        }
+        
+        function updateTrekFoodQuantity() {
+            const trekItems = specificGear['trek'];
+            const foodItem = trekItems.find(item => item.sub === 'nourriture');
+            if (foodItem) {
+                foodItem.qty = trekDays;
+                foodItem.name = `Nourriture ${trekDays}j`;
+            }
+        }
+        
+        async function updateTrekDays(days) {
+            trekDays = parseInt(days);
+            updateTrekFoodQuantity();
+            renderGear();
+            
+            // Update display
+            document.getElementById('trekDaysDisplay').textContent = trekDays + ' jours';
+            document.getElementById('trekDaysSlider').value = trekDays;
+            document.getElementById('trekDaysInput').value = trekDays;
+            
+            if (invoke) {
+                try {
+                    await invoke('update_trek_days', { days: trekDays });
+                } catch (e) {
+                    console.error('update_trek_days error:', e);
+                }
+            }
+        }
+        
+        function updateTrekDaysDisplay(value) {
+            document.getElementById('trekDaysDisplay').textContent = value + ' jours';
+            document.getElementById('trekDaysInput').value = value;
         }
 
         init();

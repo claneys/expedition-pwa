@@ -22,7 +22,7 @@ pub fn save_data(app_handle: tauri::AppHandle, data: AppData) -> Result<(), Stri
 }
 
 #[tauri::command]
-pub fn add_custom_gear(app_handle: tauri::AppHandle, name: String, qty: u32, sub: String) -> Result<AppData, String> {
+pub fn add_custom_gear(app_handle: tauri::AppHandle, name: String, qty: u32, sub: String, weight_g: Option<u32>) -> Result<AppData, String> {
     let mut data = load_data(app_handle.clone())?;
     data.custom_gear.push(GearItem {
         name,
@@ -30,6 +30,7 @@ pub fn add_custom_gear(app_handle: tauri::AppHandle, name: String, qty: u32, sub
         sub,
         checked: false,
         source: Some("custom".into()),
+        weight_g,
     });
     save_data(app_handle, data.clone())?;
     Ok(data)
@@ -42,6 +43,14 @@ pub fn remove_custom_gear(app_handle: tauri::AppHandle, index: usize) -> Result<
         data.custom_gear.remove(index);
         save_data(app_handle, data.clone())?;
     }
+    Ok(data)
+}
+
+#[tauri::command]
+pub fn update_trek_days(app_handle: tauri::AppHandle, days: u32) -> Result<AppData, String> {
+    let mut data = load_data(app_handle.clone())?;
+    data.trek_days = days;
+    save_data(app_handle, data.clone())?;
     Ok(data)
 }
 
@@ -126,6 +135,7 @@ pub async fn fetch_gear_share(
                 sub: sub.to_string(),
                 checked: false,
                 source: Some("gear-share".into()),
+                weight_g: item["weight_g"].as_u64().map(|w| w as u32),
             }
         })
         .collect();
@@ -174,6 +184,7 @@ mod tests {
             sub: "bivouac".to_string(),
             checked: false,
             source: Some("custom".to_string()),
+            weight_g: Some(800),
         });
         
         // Save
@@ -199,6 +210,7 @@ mod tests {
             sub: "technique".to_string(),
             checked: false,
             source: Some("custom".to_string()),
+            weight_g: Some(250),
         });
         
         assert_eq!(data.custom_gear.len(), 1);
@@ -217,6 +229,7 @@ mod tests {
             sub: "technique".to_string(),
             checked: false,
             source: Some("custom".to_string()),
+            weight_g: Some(300),
         });
         
         data.custom_gear.push(GearItem {
@@ -225,6 +238,7 @@ mod tests {
             sub: "confort".to_string(),
             checked: false,
             source: Some("custom".to_string()),
+            weight_g: None,
         });
         
         assert_eq!(data.custom_gear.len(), 2);
@@ -330,8 +344,27 @@ mod tests {
             sub: "bivouac".to_string(),
             checked: false,
             source: Some("gear-share".to_string()),
+            weight_g: Some(1200),
         };
         
         assert_eq!(item.source, Some("gear-share".to_string()));
+        assert_eq!(item.weight_g, Some(1200));
+    }
+    
+    #[test]
+    fn test_trek_days_default() {
+        let data = AppData::default();
+        assert_eq!(data.trek_days, 3);
+    }
+    
+    #[test]
+    fn test_trek_days_persistence() {
+        let mut data = AppData::default();
+        data.trek_days = 7;
+        
+        let json = serde_json::to_string_pretty(&data).unwrap();
+        let loaded: AppData = serde_json::from_str(&json).unwrap();
+        
+        assert_eq!(loaded.trek_days, 7);
     }
 }

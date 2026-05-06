@@ -12,6 +12,7 @@ pub struct GearItem {
     pub sub: String,
     pub checked: bool,
     pub source: Option<String>, // "default", "gear-share", "custom"
+    pub weight_g: Option<u32>, // Poids en grammes
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -28,6 +29,7 @@ pub struct AppData {
     pub commun_gear: Vec<GearItem>,
     pub custom_gear: Vec<GearItem>,       // Items ajoutés par l'utilisateur
     pub gear_share_config: Option<GearShareConfig>,
+    pub trek_days: u32,                   // Nombre de jours de trek
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -49,63 +51,64 @@ impl Default for AppData {
             ],
             specific_gear: [
                 ("ski-rando".to_string(), vec![
-                    GearItem { name: "Skis".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Peaux".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Chaussures de skis".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Bâtons".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Couteaux".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
+                    GearItem { name: "Skis".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Peaux".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Chaussures de skis".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Bâtons".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Couteaux".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
                 ]),
                 ("alpinisme".to_string(), vec![
-                    GearItem { name: "Crampons".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Piolet".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Casque".into(), qty: 1, sub: "sécurité".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Baudrier".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
+                    GearItem { name: "Crampons".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Piolet".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Casque".into(), qty: 1, sub: "sécurité".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Baudrier".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
                 ]),
                 ("escalade".to_string(), vec![
-                    GearItem { name: "Corde simple".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Corde double".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
+                    GearItem { name: "Corde simple".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Corde double".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
                 ]),
                 ("randonnee".to_string(), vec![
-                    GearItem { name: "Bâtons randonné".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
+                    GearItem { name: "Bâtons randonné".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
                 ]),
                 ("trek".to_string(), vec![
-                    GearItem { name: "Tente / Tarp".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Sac de couchage".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Matelas".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Réchaud + cartouche".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Popote + couverts".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Nourriture 3j".into(), qty: 1, sub: "nourriture".into(), checked: false, source: Some("default".into()) },
-                    GearItem { name: "Corde".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
+                    GearItem { name: "Tente / Tarp".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Sac de couchage".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Matelas".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Réchaud + cartouche".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Popote + couverts".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Nourriture 3j".into(), qty: 1, sub: "nourriture".into(), checked: false, source: Some("default".into()), weight_g: None },
+                    GearItem { name: "Corde".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
                 ]),
             ].into_iter().collect(),
             commun_gear: vec![
-                GearItem { name: "Collant Mérinos".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Pantalon ski".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Chaussettes ski".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Polaire".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Goretex".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Doudoune".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Bonnet-buff".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Gants".into(), qty: 2, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Lunettes soleil".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Masque".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Crème solaire".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Frontale".into(), qty: 1, sub: "sécurité".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Sac à viande".into(), qty: 1, sub: "sécurité".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Médicaments + boules quies".into(), qty: 1, sub: "sécurité".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Gourde".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Thermos".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Barres énergétiques".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Chargeur téléphone".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Batterie externe".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Musique / Écouteurs".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Microserviette + nécessaire toilette".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Sac à dos 35L mini".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Cash (ouèche pour refuge)".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
-                GearItem { name: "Collant + sous-pull rechange refuge".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()) },
+                GearItem { name: "Collant Mérinos".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Pantalon ski".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Chaussettes ski".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Polaire".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Goretex".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Doudoune".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Bonnet-buff".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Gants".into(), qty: 2, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Lunettes soleil".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Masque".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Crème solaire".into(), qty: 1, sub: "vêtements".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Frontale".into(), qty: 1, sub: "sécurité".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Sac à viande".into(), qty: 1, sub: "sécurité".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Médicaments + boules quies".into(), qty: 1, sub: "sécurité".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Gourde".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Thermos".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Barres énergétiques".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Chargeur téléphone".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Batterie externe".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Musique / Écouteurs".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Microserviette + nécessaire toilette".into(), qty: 1, sub: "confort".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Sac à dos 35L mini".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Cash (ouèche pour refuge)".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
+                GearItem { name: "Collant + sous-pull rechange refuge".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
             ],
             custom_gear: vec![],
             gear_share_config: None,
+            trek_days: 3,
         }
     }
 }
@@ -129,7 +132,8 @@ pub fn run() {
             commands::save_data,
             commands::add_custom_gear,
             commands::remove_custom_gear,
-            commands::fetch_gear_share
+            commands::fetch_gear_share,
+            commands::update_trek_days
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -147,6 +151,7 @@ mod tests {
             sub: "technique".to_string(),
             checked: false,
             source: Some("default".to_string()),
+            weight_g: Some(500),
         };
         
         assert_eq!(item.name, "Test Item");
@@ -154,6 +159,7 @@ mod tests {
         assert_eq!(item.sub, "technique");
         assert!(!item.checked);
         assert_eq!(item.source, Some("default".to_string()));
+        assert_eq!(item.weight_g, Some(500));
     }
 
     #[test]
@@ -192,6 +198,9 @@ mod tests {
         
         // Check gear share config is None by default
         assert!(data.gear_share_config.is_none());
+        
+        // Check trek days default
+        assert_eq!(data.trek_days, 3);
     }
 
     #[test]
