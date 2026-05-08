@@ -444,6 +444,50 @@
             -webkit-appearance: none;
         }
 
+        .item-weight {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            padding: 3px 8px;
+            border-radius: 100px;
+            white-space: nowrap;
+        }
+
+        .total-weight-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+
+        .total-weight-bar .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .total-weight-bar .value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .total-weight-bar .value .unit {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-left: 4px;
+        }
+
         .item-subcategory {
             font-size: 0.65rem;
             font-weight: 600;
@@ -678,6 +722,11 @@
         </section>
     </div>
 
+    <div class="total-weight-bar" id="totalWeightBar">
+        <span class="label">Poids total</span>
+        <span class="value" id="totalWeight">0<span class="unit">g</span></span>
+    </div>
+
     <div class="toast" id="toast">Message</div>
 
     <!-- Add Item Modal -->
@@ -870,6 +919,7 @@
                     </div>
                 `;
                 countEl.textContent = '0 articles';
+                updateTotalWeight();
                 return;
             }
 
@@ -900,6 +950,7 @@
                 : `${totalItems} articles`;
 
             container.innerHTML = html;
+            updateTotalWeight();
         }
 
         function renderCategory(icon, name, items, prefix, isCommunity) {
@@ -947,7 +998,7 @@
         function renderGearItem(item) {
             const isPacked = packedItems.has(item.id);
             const sourceBadge = item.source ? `<span class="gear-source-badge">${item.source}</span>` : '';
-            const weightBadge = item.weight_g ? `<span class="item-weight">${item.weight_g}g</span>` : '';
+            const weightDisplay = item.weight_g ? `${item.weight_g}g` : '';
             return `
                 <div class="gear-item ${isPacked ? 'packed' : ''}" onclick="togglePacked('${item.id}')">
                     <label class="gear-checkbox" onclick="event.stopPropagation()">
@@ -956,7 +1007,7 @@
                     </label>
                     <span class="item-name">${item.name}${sourceBadge}</span>
                     <span class="item-subcategory ${item.sub}">${subCategories[item.sub] || item.sub}</span>
-                    ${weightBadge}
+                    <span class="item-weight">${weightDisplay}</span>
                     <div class="item-qty" onclick="event.stopPropagation()">
                         <input type="number" value="${item.qty}" min="1"
                                onchange="updateQty('${item.id}', this.value)"
@@ -964,6 +1015,38 @@
                     </div>
                 </div>
             `;
+        }
+
+        function updateTotalWeight() {
+            let total = 0;
+
+            selectedActivities.forEach(actId => {
+                const items = specificGear[actId] || [];
+                items.forEach((item, idx) => {
+                    if (!packedItems.has(`${actId}-${idx}`) && item.weight_g) {
+                        total += item.weight_g * item.qty;
+                    }
+                });
+            });
+
+            communGear.forEach((item, idx) => {
+                if (!packedItems.has(`commun-${idx}`) && item.weight_g) {
+                    total += item.weight_g * item.qty;
+                }
+            });
+
+            customGear.forEach((item, idx) => {
+                if (!packedItems.has(`custom-${idx}`) && item.weight_g) {
+                    total += item.weight_g * item.qty;
+                }
+            });
+
+            const totalEl = document.getElementById('totalWeight');
+            if (total >= 1000) {
+                totalEl.innerHTML = `${(total / 1000).toFixed(2)}<span class="unit">kg</span>`;
+            } else {
+                totalEl.innerHTML = `${total}<span class="unit">g</span>`;
+            }
         }
 
         // ═══════════════════════════════════════════════════════════════
@@ -996,6 +1079,7 @@
                 packedItems.add(id);
             }
             renderGear();
+            updateTotalWeight();
         }
 
         function updateQty(id, value) {
@@ -1012,6 +1096,7 @@
             }
             tauriSave();
             renderGear();
+            updateTotalWeight();
         }
 
         function selectAll() {
