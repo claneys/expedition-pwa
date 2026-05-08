@@ -1,0 +1,13 @@
+/home/claneys/Workspace/Personal/gitlab/expedition-tauri/src-tauri/target/debug/deps/log-1ffd9ba9fe38efea.d: /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/lib.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/macros.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/serde.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/mod.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/error.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/key.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/source.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/value.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/__private_api.rs
+
+/home/claneys/Workspace/Personal/gitlab/expedition-tauri/src-tauri/target/debug/deps/liblog-1ffd9ba9fe38efea.rmeta: /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/lib.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/macros.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/serde.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/mod.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/error.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/key.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/source.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/value.rs /home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/__private_api.rs
+
+/home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/lib.rs:
+/home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/macros.rs:
+/home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/serde.rs:
+/home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/mod.rs:
+/home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/error.rs:
+/home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/key.rs:
+/home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/source.rs:
+/home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/kv/value.rs:
+/home/claneys/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/log-0.4.29/src/__private_api.rs:

@@ -445,12 +445,40 @@
         }
 
         .item-weight {
+            display: flex;
+            align-items: center;
+            gap: 2px;
             font-size: 0.75rem;
             color: var(--text-muted);
             background: var(--bg-secondary);
             padding: 3px 8px;
             border-radius: 100px;
             white-space: nowrap;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .item-weight:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .item-weight input {
+            width: 36px;
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: right;
+            outline: none;
+        }
+
+        .item-weight input::-webkit-inner-spin-button,
+        .item-weight input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
         }
 
         .total-weight-bar {
@@ -998,7 +1026,7 @@
         function renderGearItem(item) {
             const isPacked = packedItems.has(item.id);
             const sourceBadge = item.source ? `<span class="gear-source-badge">${item.source}</span>` : '';
-            const weightDisplay = item.weight_g ? `${item.weight_g}g` : '';
+            const weightValue = item.weight_g || '';
             return `
                 <div class="gear-item ${isPacked ? 'packed' : ''}" onclick="togglePacked('${item.id}')">
                     <label class="gear-checkbox" onclick="event.stopPropagation()">
@@ -1007,7 +1035,11 @@
                     </label>
                     <span class="item-name">${item.name}${sourceBadge}</span>
                     <span class="item-subcategory ${item.sub}">${subCategories[item.sub] || item.sub}</span>
-                    <span class="item-weight">${weightDisplay}</span>
+                    <div class="item-weight" onclick="event.stopPropagation()">
+                        <input type="number" value="${weightValue}" min="0" placeholder="g"
+                               onchange="updateWeight('${item.id}', this.value)"
+                               onclick="event.stopPropagation()">
+                    </div>
                     <div class="item-qty" onclick="event.stopPropagation()">
                         <input type="number" value="${item.qty}" min="1"
                                onchange="updateQty('${item.id}', this.value)"
@@ -1093,6 +1125,23 @@
                 customGear[idx].qty = newQty;
             } else {
                 specificGear[prefix][idx].qty = newQty;
+            }
+            tauriSave();
+            renderGear();
+            updateTotalWeight();
+        }
+
+        function updateWeight(id, value) {
+            const newWeight = value ? parseInt(value) : null;
+            const parts = id.split('-');
+            const idx = parseInt(parts[parts.length - 1]);
+            const prefix = parts.slice(0, -1).join('-');
+            if (prefix === 'commun') {
+                communGear[idx].weight_g = newWeight;
+            } else if (prefix === 'custom') {
+                customGear[idx].weight_g = newWeight;
+            } else {
+                specificGear[prefix][idx].weight_g = newWeight;
             }
             tauriSave();
             renderGear();
