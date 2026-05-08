@@ -731,24 +731,7 @@
             <button class="action-btn" onclick="showGearShareModal()">🔗 Gear-share</button>
         </div>
 
-        <div class="trek-config" id="trekConfig" style="display: none; margin-bottom: 20px; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                <span class="section-label" style="margin-bottom: 0;">Configuration Trek</span>
-                <span id="trekDaysDisplay" style="color: var(--accent); font-weight: 600;">3 jours</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 0.85rem; color: var(--text-secondary);">Jours:</span>
-                <input type="range" id="trekDaysSlider" min="1" max="14" value="3" 
-                       style="flex: 1; accent-color: var(--accent);"
-                       oninput="updateTrekDaysDisplay(this.value)" onchange="updateTrekDays(this.value)">
-                <input type="number" id="trekDaysInput" min="1" max="14" value="3"
-                       style="width: 60px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); padding: 6px; text-align: center;"
-                       onchange="updateTrekDays(this.value)">
-            </div>
-            <div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);">
-                La nourriture sera ajustée automatiquement
-            </div>
-        </div>
+
 
         <section class="gear-section">
             <div class="gear-header">
@@ -883,7 +866,7 @@
                 { name: 'Matelas', qty: 1, sub: 'bivouac' },
                 { name: 'Réchaud + cartouche', qty: 1, sub: 'bivouac' },
                 { name: 'Popote + couverts', qty: 1, sub: 'bivouac' },
-                { name: 'Nourriture 3j', qty: 1, sub: 'nourriture' }
+                { name: 'Nourriture', qty: 3, sub: 'nourriture' }
             ]
         };
 
@@ -916,7 +899,6 @@
 
         let customGear = [];
         let gearShareConfig = null;
-        let trekDays = 3;
 
         // ═══════════════════════════════════════════════════════════════
         // STATE
@@ -1097,14 +1079,6 @@
                 selectedActivities.delete(id);
             } else {
                 selectedActivities.add(id);
-            }
-            
-            // Show/hide trek config
-            const trekConfig = document.getElementById('trekConfig');
-            if (selectedActivities.has('trek')) {
-                trekConfig.style.display = 'block';
-            } else {
-                trekConfig.style.display = 'none';
             }
             
             renderActivities();
@@ -1321,46 +1295,9 @@
                 communGear = data.commun_gear || communGear;
                 customGear = data.custom_gear || [];
                 gearShareConfig = data.gear_share_config || null;
-                trekDays = data.trek_days || 3;
-                
-                // Update trek food quantity based on days
-                updateTrekFoodQuantity();
             }
             renderActivities();
             renderGear();
-        }
-        
-        function updateTrekFoodQuantity() {
-            const trekItems = specificGear['trek'];
-            const foodItem = trekItems.find(item => item.sub === 'nourriture');
-            if (foodItem) {
-                foodItem.qty = trekDays;
-                foodItem.name = `Nourriture ${trekDays}j`;
-            }
-        }
-        
-        async function updateTrekDays(days) {
-            trekDays = parseInt(days);
-            updateTrekFoodQuantity();
-            renderGear();
-            
-            // Update display
-            document.getElementById('trekDaysDisplay').textContent = trekDays + ' jours';
-            document.getElementById('trekDaysSlider').value = trekDays;
-            document.getElementById('trekDaysInput').value = trekDays;
-            
-            if (invoke) {
-                try {
-                    await invoke('update_trek_days', { days: trekDays });
-                } catch (e) {
-                    console.error('update_trek_days error:', e);
-                }
-            }
-        }
-        
-        function updateTrekDaysDisplay(value) {
-            document.getElementById('trekDaysDisplay').textContent = value + ' jours';
-            document.getElementById('trekDaysInput').value = value;
         }
 
         init();
