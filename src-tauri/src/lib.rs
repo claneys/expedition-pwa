@@ -77,7 +77,6 @@ impl Default for AppData {
                     GearItem { name: "Réchaud + cartouche".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()), weight_g: None },
                     GearItem { name: "Popote + couverts".into(), qty: 1, sub: "bivouac".into(), checked: false, source: Some("default".into()), weight_g: None },
                     GearItem { name: "Nourriture 3j".into(), qty: 1, sub: "nourriture".into(), checked: false, source: Some("default".into()), weight_g: None },
-                    GearItem { name: "Corde".into(), qty: 1, sub: "technique".into(), checked: false, source: Some("default".into()), weight_g: None },
                 ]),
             ].into_iter().collect(),
             commun_gear: vec![
